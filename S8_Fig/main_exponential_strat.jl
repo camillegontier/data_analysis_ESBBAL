@@ -18,7 +18,8 @@ sim = NestedFilterSimulation(
         LinRange(0.05,1,30),
         LinRange(0.05,1,30),
         1024, 256, 12,
-        timestep = FixedTimestep(1.0)
+        timestep = RandomTimestep(Exponential(0.705));
+        resampling_method = Stratified()
         )
 
 function f1(sim, time)
@@ -56,7 +57,7 @@ function f1(sim, time)
 end
 
 function f2(data)
-        save(string("constant_joint_",Base.parse(Int, ENV["SLURM_ARRAY_TASK_ID"]),".jld"), "data", data)
+        save(string("exponential_strat_",Base.parse(Int, ENV["SLURM_ARRAY_TASK_ID"]),".jld"), "data", data)
 end
 
 rec = Recording(f1, f2, sim)

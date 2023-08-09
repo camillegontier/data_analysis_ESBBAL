@@ -40,11 +40,6 @@ function f1(sim, time)
 
     τind = Array(sim.fstate.model.τind)
     τrng = Array(sim.fstate.model.τrng)
-    τ_posterior = zeros(length(τrng))
-    for j in 1:length(τrng)
-        τ_posterior[j] = count(i->(i==j),τind)
-    end
-    entropy_τ = entropy(τ_posterior/sum(τ_posterior))
 
     map = MAP(sim.fstate.model)
     map_N = map.N
@@ -53,11 +48,11 @@ function f1(sim, time)
     map_σ = map.σ
     map_τ = map.τ
 
-    s = [Nrng[Nind]';prng[pind]';qrng[qind]';σrng[σind]';τrng[τind]']
+    s = [Nrng[Nind]'./Nrng[end];prng[pind]'./prng[end];qrng[qind]'./qrng[end];σrng[σind]'./σrng[end];τrng[τind]'./τrng[end]]
     Σ_est = cov(s')
     entropy_gaussian = 0.5*log(det(2*pi*ℯ*Σ_est))
 
-    return entropy_τ, map_N, map_p, map_q, map_σ, map_τ, sim.times, time, entropy_gaussian
+    return map_N, map_p, map_q, map_σ, map_τ, sim.times, time, entropy_gaussian
 end
 
 function f2(data)
@@ -67,4 +62,4 @@ end
 rec = Recording(f1, f2, sim)
 
 sim.hstate.n .= N
-times, epsps = run!(sim, T = 400, recording = Recording(f1, f2, sim))
+times, epsps = run!(sim, T = 200, recording = Recording(f1, f2, sim))
